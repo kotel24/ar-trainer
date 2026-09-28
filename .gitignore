@@ -1,0 +1,12 @@
+.DS_Store
+.idea/
+*.iml
+out/
+build/
+target/
+*.class
+__pycache__/
+*.pyc
+.venv/
+venv/
+~$*.docx
