@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Definitions_internship" targetNamespace="https://github.com/kotel24/ar-trainer">
+  <bpmn:collaboration id="Collaboration_internship">
+    <bpmn:participant id="P_internship" name="Стажировка на рабочем месте (станок 2Н135)" processRef="Process_internship" />
+    <bpmn:participant id="P_safety" name="Отдел охраны труда" />
+    <bpmn:messageFlow id="M_program" name="Программа стажировки" sourceRef="P_safety" targetRef="T_order" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_internship" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_internship">
+      <bpmn:lane id="L_master" name="Мастер участка">
+        <bpmn:flowNodeRef>Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_order</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_skills</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_extend</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_admit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_mentor" name="Наставник">
+        <bpmn:flowNodeRef>T_intro</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_mergeA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_mergeB</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_show</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_check</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_danger</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_stop</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_term</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_eval</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_mark</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_concl</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="L_trainee" name="Стажёр">
+        <bpmn:flowNodeRef>T_watch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>T_self</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start" name="Работник прошёл первичный инструктаж">
+      <bpmn:outgoing>F_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="T_order" name="Оформить распоряжение о стажировке">
+      <bpmn:incoming>F_1</bpmn:incoming>
+      <bpmn:outgoing>F_2</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="A_DO_order"><bpmn:targetRef>R_DO_order</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="T_intro" name="Ознакомить стажёра с программой и опасными зонами">
+      <bpmn:incoming>F_2</bpmn:incoming>
+      <bpmn:outgoing>F_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_mergeA">
+      <bpmn:incoming>F_3</bpmn:incoming>
+      <bpmn:incoming>F_20</bpmn:incoming>
+      <bpmn:outgoing>F_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="G_mergeB">
+      <bpmn:incoming>F_4</bpmn:incoming>
+      <bpmn:incoming>F_10</bpmn:incoming>
+      <bpmn:outgoing>F_5</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_show" name="Показать операцию на станке">
+      <bpmn:incoming>F_5</bpmn:incoming>
+      <bpmn:outgoing>F_6</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_watch" name="Выполнить операцию под наблюдением">
+      <bpmn:incoming>F_6</bpmn:incoming>
+      <bpmn:incoming>F_12</bpmn:incoming>
+      <bpmn:outgoing>F_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_check" name="Проверить действия стажёра">
+      <bpmn:incoming>F_7</bpmn:incoming>
+      <bpmn:outgoing>F_8</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_danger" name="Опасная ошибка?">
+      <bpmn:incoming>F_8</bpmn:incoming>
+      <bpmn:outgoing>F_9</bpmn:outgoing>
+      <bpmn:outgoing>F_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_stop" name="Остановить стажёра и объяснить ошибку">
+      <bpmn:incoming>F_9</bpmn:incoming>
+      <bpmn:outgoing>F_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_term" name="Срок по программе истёк?">
+      <bpmn:incoming>F_11</bpmn:incoming>
+      <bpmn:outgoing>F_12</bpmn:outgoing>
+      <bpmn:outgoing>F_13</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_self" name="Выполнить операцию самостоятельно">
+      <bpmn:incoming>F_13</bpmn:incoming>
+      <bpmn:outgoing>F_14</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_eval" name="Оценить навыки стажёра">
+      <bpmn:incoming>F_14</bpmn:incoming>
+      <bpmn:outgoing>F_15</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_mark" name="Сделать отметку о прохождении стажировки">
+      <bpmn:incoming>F_15</bpmn:incoming>
+      <bpmn:outgoing>F_16</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="A_DO_log"><bpmn:targetRef>R_DO_log</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:task id="T_concl" name="Составить заключение">
+      <bpmn:incoming>F_16</bpmn:incoming>
+      <bpmn:outgoing>F_17</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="A_DO_concl"><bpmn:targetRef>R_DO_concl</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="G_skills" name="Навыки достаточны?">
+      <bpmn:incoming>F_17</bpmn:incoming>
+      <bpmn:outgoing>F_18</bpmn:outgoing>
+      <bpmn:outgoing>F_19</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="T_extend" name="Продлить стажировку">
+      <bpmn:incoming>F_19</bpmn:incoming>
+      <bpmn:outgoing>F_20</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="T_admit" name="Оформить допуск к самостоятельной работе">
+      <bpmn:incoming>F_18</bpmn:incoming>
+      <bpmn:outgoing>F_21</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="A_DO_admit"><bpmn:targetRef>R_DO_admit</bpmn:targetRef></bpmn:dataOutputAssociation>
+    </bpmn:task>
+    <bpmn:endEvent id="End" name="Работник допущен к самостоятельной работе">
+      <bpmn:incoming>F_21</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F_1" sourceRef="Start" targetRef="T_order" />
+    <bpmn:sequenceFlow id="F_2" sourceRef="T_order" targetRef="T_intro" />
+    <bpmn:sequenceFlow id="F_3" sourceRef="T_intro" targetRef="G_mergeA" />
+    <bpmn:sequenceFlow id="F_4" sourceRef="G_mergeA" targetRef="G_mergeB" />
+    <bpmn:sequenceFlow id="F_5" sourceRef="G_mergeB" targetRef="T_show" />
+    <bpmn:sequenceFlow id="F_6" sourceRef="T_show" targetRef="T_watch" />
+    <bpmn:sequenceFlow id="F_7" sourceRef="T_watch" targetRef="T_check" />
+    <bpmn:sequenceFlow id="F_8" sourceRef="T_check" targetRef="G_danger" />
+    <bpmn:sequenceFlow id="F_9" name="да" sourceRef="G_danger" targetRef="T_stop" />
+    <bpmn:sequenceFlow id="F_10" sourceRef="T_stop" targetRef="G_mergeB" />
+    <bpmn:sequenceFlow id="F_11" name="нет" sourceRef="G_danger" targetRef="G_term" />
+    <bpmn:sequenceFlow id="F_12" name="нет" sourceRef="G_term" targetRef="T_watch" />
+    <bpmn:sequenceFlow id="F_13" name="да" sourceRef="G_term" targetRef="T_self" />
+    <bpmn:sequenceFlow id="F_14" sourceRef="T_self" targetRef="T_eval" />
+    <bpmn:sequenceFlow id="F_15" sourceRef="T_eval" targetRef="T_mark" />
+    <bpmn:sequenceFlow id="F_16" sourceRef="T_mark" targetRef="T_concl" />
+    <bpmn:sequenceFlow id="F_17" sourceRef="T_concl" targetRef="G_skills" />
+    <bpmn:sequenceFlow id="F_18" name="да" sourceRef="G_skills" targetRef="T_admit" />
+    <bpmn:sequenceFlow id="F_19" name="нет" sourceRef="G_skills" targetRef="T_extend" />
+    <bpmn:sequenceFlow id="F_20" sourceRef="T_extend" targetRef="G_mergeA" />
+    <bpmn:sequenceFlow id="F_21" sourceRef="T_admit" targetRef="End" />
+    <bpmn:dataObject id="DO_order" />
+    <bpmn:dataObjectReference id="R_DO_order" name="Распоряжение о стажировке" dataObjectRef="DO_order" />
+    <bpmn:dataObject id="DO_log" />
+    <bpmn:dataObjectReference id="R_DO_log" name="Журнал стажировки" dataObjectRef="DO_log" />
+    <bpmn:dataObject id="DO_concl" />
+    <bpmn:dataObjectReference id="R_DO_concl" name="Заключение наставника" dataObjectRef="DO_concl" />
+    <bpmn:dataObject id="DO_admit" />
+    <bpmn:dataObjectReference id="R_DO_admit" name="Распоряжение о допуске" dataObjectRef="DO_admit" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_internship">
+    <bpmndi:BPMNPlane id="Plane_internship" bpmnElement="Collaboration_internship">
+      <bpmndi:BPMNShape id="P_internship_di" bpmnElement="P_internship" isHorizontal="true"><dc:Bounds x="100" y="140" width="2300" height="620" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_safety_di" bpmnElement="P_safety" isHorizontal="true"><dc:Bounds x="200" y="20" width="330" height="60" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_master_di" bpmnElement="L_master" isHorizontal="true"><dc:Bounds x="130" y="140" width="2270" height="220" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_mentor_di" bpmnElement="L_mentor" isHorizontal="true"><dc:Bounds x="130" y="360" width="2270" height="240" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_trainee_di" bpmnElement="L_trainee" isHorizontal="true"><dc:Bounds x="130" y="600" width="2270" height="160" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_di" bpmnElement="Start"><dc:Bounds x="182" y="282" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="155" y="234" width="90" height="42" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_order_di" bpmnElement="T_order"><dc:Bounds x="270" y="260" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_intro_di" bpmnElement="T_intro"><dc:Bounds x="420" y="460" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_mergeA_di" bpmnElement="G_mergeA" isMarkerVisible="true"><dc:Bounds x="575" y="475" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_mergeB_di" bpmnElement="G_mergeB" isMarkerVisible="true"><dc:Bounds x="665" y="475" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_show_di" bpmnElement="T_show" bioc:fill="#c6e5c0" color:background-color="#c6e5c0"><dc:Bounds x="750" y="460" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_watch_di" bpmnElement="T_watch"><dc:Bounds x="900" y="600" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_check_di" bpmnElement="T_check" bioc:fill="#c6e5c0" color:background-color="#c6e5c0"><dc:Bounds x="1050" y="460" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_danger_di" bpmnElement="G_danger" isMarkerVisible="true"><dc:Bounds x="1215" y="475" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1195" y="530" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_stop_di" bpmnElement="T_stop"><dc:Bounds x="1180" y="360" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_term_di" bpmnElement="G_term" isMarkerVisible="true"><dc:Bounds x="1325" y="475" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1310" y="438" width="100" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_self_di" bpmnElement="T_self"><dc:Bounds x="1420" y="600" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_eval_di" bpmnElement="T_eval" bioc:fill="#c6e5c0" color:background-color="#c6e5c0"><dc:Bounds x="1570" y="460" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_mark_di" bpmnElement="T_mark" bioc:fill="#c6e5c0" color:background-color="#c6e5c0"><dc:Bounds x="1720" y="460" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_concl_di" bpmnElement="T_concl"><dc:Bounds x="1870" y="460" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_skills_di" bpmnElement="G_skills" isMarkerVisible="true"><dc:Bounds x="2035" y="275" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1945" y="262" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_extend_di" bpmnElement="T_extend"><dc:Bounds x="2000" y="160" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_admit_di" bpmnElement="T_admit"><dc:Bounds x="2130" y="260" width="120" height="80" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_di" bpmnElement="End"><dc:Bounds x="2302" y="282" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="2275" y="218" width="90" height="56" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_order_di" bpmnElement="R_DO_order"><dc:Bounds x="442" y="175" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="480" y="186" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_log_di" bpmnElement="R_DO_log"><dc:Bounds x="1762" y="375" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1800" y="386" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_concl_di" bpmnElement="R_DO_concl"><dc:Bounds x="1912" y="375" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1950" y="386" width="80" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_admit_di" bpmnElement="R_DO_admit"><dc:Bounds x="2172" y="175" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="2210" y="186" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F_1_di" bpmnElement="F_1"><di:waypoint x="218" y="300" /><di:waypoint x="270" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_2_di" bpmnElement="F_2"><di:waypoint x="390" y="300" /><di:waypoint x="480" y="300" /><di:waypoint x="480" y="460" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_3_di" bpmnElement="F_3"><di:waypoint x="540" y="500" /><di:waypoint x="575" y="500" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_4_di" bpmnElement="F_4"><di:waypoint x="625" y="500" /><di:waypoint x="665" y="500" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_5_di" bpmnElement="F_5"><di:waypoint x="715" y="500" /><di:waypoint x="750" y="500" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_6_di" bpmnElement="F_6"><di:waypoint x="870" y="500" /><di:waypoint x="960" y="500" /><di:waypoint x="960" y="600" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_7_di" bpmnElement="F_7"><di:waypoint x="1020" y="640" /><di:waypoint x="1110" y="640" /><di:waypoint x="1110" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_8_di" bpmnElement="F_8"><di:waypoint x="1170" y="500" /><di:waypoint x="1215" y="500" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_9_di" bpmnElement="F_9"><di:waypoint x="1240" y="475" /><di:waypoint x="1240" y="440" /><bpmndi:BPMNLabel><dc:Bounds x="1246" y="454" width="20" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_10_di" bpmnElement="F_10"><di:waypoint x="1180" y="400" /><di:waypoint x="690" y="400" /><di:waypoint x="690" y="475" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_11_di" bpmnElement="F_11"><di:waypoint x="1265" y="500" /><di:waypoint x="1325" y="500" /><bpmndi:BPMNLabel><dc:Bounds x="1272" y="482" width="24" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_12_di" bpmnElement="F_12"><di:waypoint x="1350" y="525" /><di:waypoint x="1350" y="720" /><di:waypoint x="960" y="720" /><di:waypoint x="960" y="680" /><bpmndi:BPMNLabel><dc:Bounds x="1356" y="530" width="24" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_13_di" bpmnElement="F_13"><di:waypoint x="1375" y="500" /><di:waypoint x="1480" y="500" /><di:waypoint x="1480" y="600" /><bpmndi:BPMNLabel><dc:Bounds x="1384" y="482" width="20" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_14_di" bpmnElement="F_14"><di:waypoint x="1540" y="640" /><di:waypoint x="1630" y="640" /><di:waypoint x="1630" y="540" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_15_di" bpmnElement="F_15"><di:waypoint x="1690" y="500" /><di:waypoint x="1720" y="500" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_16_di" bpmnElement="F_16"><di:waypoint x="1840" y="500" /><di:waypoint x="1870" y="500" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_17_di" bpmnElement="F_17"><di:waypoint x="1990" y="500" /><di:waypoint x="2060" y="500" /><di:waypoint x="2060" y="325" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_18_di" bpmnElement="F_18"><di:waypoint x="2085" y="300" /><di:waypoint x="2130" y="300" /><bpmndi:BPMNLabel><dc:Bounds x="2092" y="282" width="20" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_19_di" bpmnElement="F_19"><di:waypoint x="2060" y="275" /><di:waypoint x="2060" y="240" /><bpmndi:BPMNLabel><dc:Bounds x="2066" y="254" width="24" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_20_di" bpmnElement="F_20"><di:waypoint x="2000" y="200" /><di:waypoint x="600" y="200" /><di:waypoint x="600" y="475" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_21_di" bpmnElement="F_21"><di:waypoint x="2250" y="300" /><di:waypoint x="2302" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_DO_order_di" bpmnElement="A_DO_order"><di:waypoint x="390" y="280" /><di:waypoint x="442" y="210" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_DO_log_di" bpmnElement="A_DO_log"><di:waypoint x="1780" y="460" /><di:waypoint x="1780" y="425" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_DO_concl_di" bpmnElement="A_DO_concl"><di:waypoint x="1930" y="460" /><di:waypoint x="1930" y="425" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_DO_admit_di" bpmnElement="A_DO_admit"><di:waypoint x="2190" y="260" /><di:waypoint x="2190" y="225" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="M_program_di" bpmnElement="M_program"><di:waypoint x="330" y="80" /><di:waypoint x="330" y="260" /><bpmndi:BPMNLabel><dc:Bounds x="340" y="96" width="90" height="28" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
