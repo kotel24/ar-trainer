@@ -4,7 +4,7 @@
 
 Extended Reality Applications for CNC Machine Training: A Systematic Review / J. M. Ibarra Kwick, Ó. Hernández-Uribe, L. A. Cárdenas-Robledo, R. A. Luque-Morales. – DOI 10.3390/mti8090080. – Text : electronic // Multimodal Technologies and Interaction. – 2024. – Vol. 8, No. 9. – Art. 80. – URL: https://www.mdpi.com/2414-4088/8/9/80 (дата обращения: 28.09.2026).
 
-Авторы: J. M. Ibarra Kwick, Ó. Hernández-Uribe, L. A. Cárdenas-Robledo, R. A. Luque-Morales. Название: «Extended Reality Applications for CNC Machine Training: A Systematic Review» («Применение расширенной реальности для обучения работе на станках с ЧПУ: систематический обзор»). Издание: Multimodal Technologies and Interaction, 2024, т. 8, № 9, статья 80. DOI: 10.3390/mti8090080. Источник [17] списка использованных источников.
+Авторы: J. M. Ibarra Kwick, Ó. Hernández-Uribe, L. A. Cárdenas-Robledo, R. A. Luque-Morales. Название: «Extended Reality Applications for CNC Machine Training: A Systematic Review» («Применение расширенной реальности для обучения работе на станках с ЧПУ: систематический обзор»). Издание: Multimodal Technologies and Interaction, 2024, т. 8, № 9, статья 80. DOI: 10.3390/mti8090080. Источник [19] списка использованных источников.
 
 Переведены аннотация, подразделы 6.1–6.3 и раздел 7 «Заключение» (с. 1, 13–14 оригинала). Ссылки на литературу при переводе опущены.
 
