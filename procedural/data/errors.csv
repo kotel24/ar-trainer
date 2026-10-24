@@ -1,0 +1,4 @@
+error_id;attempt_id;step_id;kind_code
+1;1;110;DANGER
+2;2;106;ORDER
+3;2;112;SKIP

@@ -1,0 +1,4 @@
+kind_code;title;penalty;stops_attempt
+ORDER;Нарушен порядок шагов;10;0
+SKIP;Шаг пропущен;15;0
+DANGER;Опасное действие;100;1
