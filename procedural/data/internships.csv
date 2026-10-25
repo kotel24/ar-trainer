@@ -1,2 +1,2 @@
-order_no;order_date;trainee_id;mentor_id;master_id;scenario_id;machine_no;shifts
-47;2026-10-12;1001;1002;1003;1;СВ-014;3
+order_no;order_date;trainee_id;mentor_id;master_id;scenario_id;machine_no;shifts;conclusion;conclusion_date;completion_date;admission_order_no
+47;2026-10-12;1001;1002;1003;1;СВ-014;3;навыки достаточны;2026-10-14;2026-10-14;52
