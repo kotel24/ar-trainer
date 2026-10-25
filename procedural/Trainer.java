@@ -95,7 +95,7 @@ public class Trainer {
         }
         List<Map<String, String>> result = new ArrayList<>();
         for (Map<String, String> dependency : dependencies) {
-            if (stepIds.contains(dependency.get("step_id"))) {
+            if (stepIds.contains(dependency.get("step_id")) && stepIds.contains(dependency.get("required_step_id"))) {
                 result.add(dependency);
             }
         }
@@ -155,6 +155,9 @@ public class Trainer {
                 }
             }
         }
+        if (order.size() < steps.size()) {
+            return null;
+        }
         return order;
     }
 
@@ -166,7 +169,8 @@ public class Trainer {
     }
 
     static List<Map<String, String>> checkActions(List<Map<String, String>> steps, Map<String, List<String>> required,
-                                                  List<Map<String, String>> actions) {
+                                                  List<Map<String, String>> actions,
+                                                  Map<String, Map<String, String>> errorKinds) {
         Set<String> critical = new HashSet<>();
         for (Map<String, String> step : steps) {
             if (step.get("critical").equals("1")) {
@@ -192,13 +196,13 @@ public class Trainer {
             }
             if (dangerous) {
                 errors.add(newError(stepId, "DANGER"));
-                return errors;
-            }
-            if (missing) {
+                if (errorKinds.get("DANGER").get("stops_attempt").equals("1")) {
+                    return errors;
+                }
+            } else if (missing) {
                 errors.add(newError(stepId, "ORDER"));
-            } else {
-                done.add(stepId);
             }
+            done.add(stepId);
         }
         for (Map<String, String> step : steps) {
             if (!done.contains(step.get("step_id"))) {
@@ -249,21 +253,24 @@ public class Trainer {
 
         Path errorsFile = dataDir.resolve("errors.csv");
         List<Map<String, String>> allErrors = new ArrayList<>();
+        List<String> oldIds = new ArrayList<>();
+        int maxId = 0;
         for (Map<String, String> row : readTable(errorsFile)) {
-            if (!row.get("attempt_id").equals(attemptId)) {
+            maxId = Math.max(maxId, Integer.parseInt(row.get("error_id")));
+            if (row.get("attempt_id").equals(attemptId)) {
+                oldIds.add(row.get("error_id"));
+            } else {
                 allErrors.add(row);
             }
         }
-        for (Map<String, String> error : errors) {
+        for (int i = 0; i < errors.size(); i++) {
             Map<String, String> row = new LinkedHashMap<>();
+            row.put("error_id", i < oldIds.size() ? oldIds.get(i) : String.valueOf(++maxId));
             row.put("attempt_id", attemptId);
-            row.putAll(error);
+            row.putAll(errors.get(i));
             allErrors.add(row);
         }
-        allErrors.sort((a, b) -> Integer.compare(Integer.parseInt(a.get("attempt_id")), Integer.parseInt(b.get("attempt_id"))));
-        for (int i = 0; i < allErrors.size(); i++) {
-            allErrors.get(i).put("error_id", String.valueOf(i + 1));
-        }
+        allErrors.sort((a, b) -> Integer.compare(Integer.parseInt(a.get("error_id")), Integer.parseInt(b.get("error_id"))));
         writeTable(errorsFile, readColumns(errorsFile), allErrors);
     }
 
@@ -276,7 +283,7 @@ public class Trainer {
         List<Map<String, String>> steps = filterBy(readTable(dataDir.resolve("steps.csv")), "scenario_id", scenarioId);
         List<Map<String, String>> dependencies = dependenciesOf(steps, readTable(dataDir.resolve("dependencies.csv")));
         List<String> order = buildDemoOrder(steps, dependencies);
-        if (order.size() < steps.size()) {
+        if (order == null) {
             System.out.println("В сценарии есть циклическая зависимость шагов, показать порядок нельзя");
             System.exit(1);
         }
@@ -309,7 +316,7 @@ public class Trainer {
         List<Map<String, String>> actions = orderBySeq(filterBy(readTable(dataDir.resolve("actions.csv")), "attempt_id", attemptId));
         Map<String, Map<String, String>> errorKinds = indexBy(readTable(dataDir.resolve("error_kinds.csv")), "kind_code");
 
-        List<Map<String, String>> errors = checkActions(steps, required, actions);
+        List<Map<String, String>> errors = checkActions(steps, required, actions, errorKinds);
         int durationSec = Integer.parseInt(attempt.get("duration_sec"));
         Map<String, String> evaluation = evaluateAttempt(errors, errorKinds, durationSec, scenario);
         saveAttempt(dataDir, attemptId, evaluation, errors);
