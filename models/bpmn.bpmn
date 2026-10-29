@@ -30,6 +30,7 @@
       <bpmn:lane id="L_trainee" name="Стажёр">
         <bpmn:flowNodeRef>T_watch</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>T_self</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>G_merge2</bpmn:flowNodeRef>
       </bpmn:lane>
     </bpmn:laneSet>
     <bpmn:startEvent id="Start" name="Нужно допустить работника к станку">
@@ -46,6 +47,7 @@
     <bpmn:task id="T_intro" name="Ознакомить стажёра с программой и опасными зонами">
       <bpmn:incoming>F_2</bpmn:incoming>
       <bpmn:outgoing>F_3</bpmn:outgoing>
+      <bpmn:dataInputAssociation id="A_order2"><bpmn:sourceRef>R_DO_order2</bpmn:sourceRef><bpmn:targetRef>T_intro</bpmn:targetRef></bpmn:dataInputAssociation>
     </bpmn:task>
     <bpmn:task id="T_show" name="Показать операцию на станке">
       <bpmn:incoming>F_4</bpmn:incoming>
@@ -53,8 +55,7 @@
       <bpmn:dataInputAssociation id="A_card"><bpmn:sourceRef>R_DO_card</bpmn:sourceRef><bpmn:targetRef>T_show</bpmn:targetRef></bpmn:dataInputAssociation>
     </bpmn:task>
     <bpmn:task id="T_watch" name="Выполнить операцию под наблюдением">
-      <bpmn:incoming>F_5</bpmn:incoming>
-      <bpmn:incoming>F_11</bpmn:incoming>
+      <bpmn:incoming>F_5b</bpmn:incoming>
       <bpmn:outgoing>F_6</bpmn:outgoing>
     </bpmn:task>
     <bpmn:task id="T_check" name="Проверить действия стажёра">
@@ -83,6 +84,7 @@
     <bpmn:task id="T_extend" name="Продлить стажировку">
       <bpmn:incoming>F_17</bpmn:incoming>
       <bpmn:outgoing>F_18</bpmn:outgoing>
+      <bpmn:dataInputAssociation id="A_concl2"><bpmn:sourceRef>R_DO_concl2</bpmn:sourceRef><bpmn:targetRef>T_extend</bpmn:targetRef></bpmn:dataInputAssociation>
     </bpmn:task>
     <bpmn:task id="T_mark" name="Сделать отметку о прохождении стажировки">
       <bpmn:incoming>F_16</bpmn:incoming>
@@ -92,6 +94,7 @@
     <bpmn:task id="T_admit" name="Допустить к самостоятельной работе">
       <bpmn:incoming>F_19</bpmn:incoming>
       <bpmn:outgoing>F_20</bpmn:outgoing>
+      <bpmn:dataInputAssociation id="A_concl3"><bpmn:sourceRef>R_DO_concl3</bpmn:sourceRef><bpmn:targetRef>T_admit</bpmn:targetRef></bpmn:dataInputAssociation>
       <bpmn:dataOutputAssociation id="A_admit"><bpmn:targetRef>R_DO_admit</bpmn:targetRef></bpmn:dataOutputAssociation>
     </bpmn:task>
     <bpmn:exclusiveGateway id="G_merge">
@@ -99,6 +102,11 @@
       <bpmn:incoming>F_9</bpmn:incoming>
       <bpmn:incoming>F_18</bpmn:incoming>
       <bpmn:outgoing>F_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="G_merge2">
+      <bpmn:incoming>F_5</bpmn:incoming>
+      <bpmn:incoming>F_11</bpmn:incoming>
+      <bpmn:outgoing>F_5b</bpmn:outgoing>
     </bpmn:exclusiveGateway>
     <bpmn:exclusiveGateway id="G_danger" name="Опасная ошибка?">
       <bpmn:incoming>F_7</bpmn:incoming>
@@ -119,13 +127,14 @@
     <bpmn:sequenceFlow id="F_2" sourceRef="T_order" targetRef="T_intro" />
     <bpmn:sequenceFlow id="F_3" sourceRef="T_intro" targetRef="G_merge" />
     <bpmn:sequenceFlow id="F_4" sourceRef="G_merge" targetRef="T_show" />
-    <bpmn:sequenceFlow id="F_5" sourceRef="T_show" targetRef="T_watch" />
+    <bpmn:sequenceFlow id="F_5" sourceRef="T_show" targetRef="G_merge2" />
+    <bpmn:sequenceFlow id="F_5b" sourceRef="G_merge2" targetRef="T_watch" />
     <bpmn:sequenceFlow id="F_6" sourceRef="T_watch" targetRef="T_check" />
     <bpmn:sequenceFlow id="F_7" sourceRef="T_check" targetRef="G_danger" />
     <bpmn:sequenceFlow id="F_8" name="да" sourceRef="G_danger" targetRef="T_stop" />
     <bpmn:sequenceFlow id="F_9" sourceRef="T_stop" targetRef="G_merge" />
     <bpmn:sequenceFlow id="F_10" name="нет" sourceRef="G_danger" targetRef="G_term" />
-    <bpmn:sequenceFlow id="F_11" name="нет" sourceRef="G_term" targetRef="T_watch" />
+    <bpmn:sequenceFlow id="F_11" name="нет" sourceRef="G_term" targetRef="G_merge2" />
     <bpmn:sequenceFlow id="F_12" name="да" sourceRef="G_term" targetRef="T_self" />
     <bpmn:sequenceFlow id="F_13" sourceRef="T_self" targetRef="T_eval" />
     <bpmn:sequenceFlow id="F_14" sourceRef="T_eval" targetRef="T_concl" />
@@ -137,6 +146,7 @@
     <bpmn:sequenceFlow id="F_20" sourceRef="T_admit" targetRef="End" />
     <bpmn:dataObject id="DO_order" />
     <bpmn:dataObjectReference id="R_DO_order" name="Распоряжение о стажировке" dataObjectRef="DO_order" />
+    <bpmn:dataObjectReference id="R_DO_order2" name="Распоряжение о стажировке" dataObjectRef="DO_order" />
     <bpmn:dataObject id="DO_card" />
     <bpmn:dataObjectReference id="R_DO_card" name="Технологическая карта" dataObjectRef="DO_card" />
     <bpmn:dataObject id="DO_prot" />
@@ -144,6 +154,8 @@
     <bpmn:dataObjectReference id="R_DO_prot2" name="Протокол попытки" dataObjectRef="DO_prot" />
     <bpmn:dataObject id="DO_concl" />
     <bpmn:dataObjectReference id="R_DO_concl" name="Заключение наставника" dataObjectRef="DO_concl" />
+    <bpmn:dataObjectReference id="R_DO_concl2" name="Заключение наставника" dataObjectRef="DO_concl" />
+    <bpmn:dataObjectReference id="R_DO_concl3" name="Заключение наставника" dataObjectRef="DO_concl" />
     <bpmn:dataObject id="DO_log" />
     <bpmn:dataObjectReference id="R_DO_log" name="Журнал стажировки" dataObjectRef="DO_log" />
     <bpmn:dataObject id="DO_admit" />
@@ -151,49 +163,54 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="Diagram_internship">
     <bpmndi:BPMNPlane id="Plane_internship" bpmnElement="Collaboration_internship">
-      <bpmndi:BPMNShape id="P_internship_di" bpmnElement="P_internship" isHorizontal="true"><dc:Bounds x="100" y="130" width="1900" height="810" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="P_internship_di" bpmnElement="P_internship" isHorizontal="true"><dc:Bounds x="100" y="130" width="1900" height="910" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="P_safety_di" bpmnElement="P_safety" isHorizontal="true"><dc:Bounds x="160" y="-70" width="300" height="56" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="L_master_di" bpmnElement="L_master" isHorizontal="true"><dc:Bounds x="130" y="130" width="1870" height="230" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="L_mentor_di" bpmnElement="L_mentor" isHorizontal="true"><dc:Bounds x="130" y="360" width="1870" height="400" /></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="L_trainee_di" bpmnElement="L_trainee" isHorizontal="true"><dc:Bounds x="130" y="760" width="1870" height="180" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="L_trainee_di" bpmnElement="L_trainee" isHorizontal="true"><dc:Bounds x="130" y="760" width="1870" height="280" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Start_di" bpmnElement="Start"><dc:Bounds x="176" y="252" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="150" y="185" width="130" height="52" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="End_di" bpmnElement="End"><dc:Bounds x="1752" y="160" width="36" height="36" /><bpmndi:BPMNLabel><dc:Bounds x="1795" y="165" width="130" height="20" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_order_di" bpmnElement="T_order"><dc:Bounds x="240" y="220" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_intro_di" bpmnElement="T_intro"><dc:Bounds x="240" y="640" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_show_di" bpmnElement="T_show" bioc:fill="#c6e5c0" color:background-color="#c6e5c0"><dc:Bounds x="500" y="510" width="140" height="100" /></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="T_watch_di" bpmnElement="T_watch"><dc:Bounds x="500" y="800" width="140" height="100" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_watch_di" bpmnElement="T_watch"><dc:Bounds x="500" y="860" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_check_di" bpmnElement="T_check" bioc:fill="#c6e5c0" color:background-color="#c6e5c0"><dc:Bounds x="670" y="510" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_stop_di" bpmnElement="T_stop"><dc:Bounds x="795" y="380" width="140" height="100" /></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="T_self_di" bpmnElement="T_self"><dc:Bounds x="1020" y="800" width="140" height="100" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="T_self_di" bpmnElement="T_self"><dc:Bounds x="1020" y="860" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_eval_di" bpmnElement="T_eval" bioc:fill="#c6e5c0" color:background-color="#c6e5c0"><dc:Bounds x="1190" y="510" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_concl_di" bpmnElement="T_concl"><dc:Bounds x="1360" y="510" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_extend_di" bpmnElement="T_extend"><dc:Bounds x="1210" y="220" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_mark_di" bpmnElement="T_mark"><dc:Bounds x="1530" y="510" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="T_admit_di" bpmnElement="T_admit"><dc:Bounds x="1700" y="220" width="140" height="100" /></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="G_merge_di" bpmnElement="G_merge" isMarkerVisible="true"><dc:Bounds x="420" y="535" width="50" height="50" /></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="G_danger_di" bpmnElement="G_danger" isMarkerVisible="true"><dc:Bounds x="840" y="535" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="800" y="590" width="130" height="20" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_merge2_di" bpmnElement="G_merge2" isMarkerVisible="true"><dc:Bounds x="420" y="885" width="50" height="50" /></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="G_danger_di" bpmnElement="G_danger" isMarkerVisible="true"><dc:Bounds x="840" y="535" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="812" y="598" width="130" height="20" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="G_term_di" bpmnElement="G_term" isMarkerVisible="true"><dc:Bounds x="930" y="535" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="965" y="490" width="130" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="G_skills_di" bpmnElement="G_skills" isMarkerVisible="true"><dc:Bounds x="1405" y="245" width="50" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1360" y="195" width="130" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="R_DO_order_di" bpmnElement="R_DO_order"><dc:Bounds x="470" y="245" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="433" y="295" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_order2_di" bpmnElement="R_DO_order2"><dc:Bounds x="200" y="520" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="165" y="478" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="R_DO_card_di" bpmnElement="R_DO_card"><dc:Bounds x="472" y="645" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="435" y="695" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="R_DO_prot1_di" bpmnElement="R_DO_prot1"><dc:Bounds x="772" y="645" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="735" y="695" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="R_DO_prot2_di" bpmnElement="R_DO_prot2"><dc:Bounds x="1272" y="645" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1235" y="695" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="R_DO_concl_di" bpmnElement="R_DO_concl"><dc:Bounds x="1412" y="645" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1375" y="695" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_concl2_di" bpmnElement="R_DO_concl2"><dc:Bounds x="1120" y="245" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1083" y="295" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_concl3_di" bpmnElement="R_DO_concl3"><dc:Bounds x="1640" y="245" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1605" y="300" width="92" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="R_DO_log_di" bpmnElement="R_DO_log"><dc:Bounds x="1582" y="645" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1545" y="695" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="R_DO_admit_di" bpmnElement="R_DO_admit"><dc:Bounds x="1872" y="245" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1835" y="295" width="110" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="R_DO_admit_di" bpmnElement="R_DO_admit"><dc:Bounds x="1900" y="245" width="36" height="50" /><bpmndi:BPMNLabel><dc:Bounds x="1853" y="295" width="130" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="F_1_di" bpmnElement="F_1"><di:waypoint x="212" y="270" /><di:waypoint x="240" y="270" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_2_di" bpmnElement="F_2"><di:waypoint x="310" y="320" /><di:waypoint x="310" y="640" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_3_di" bpmnElement="F_3"><di:waypoint x="380" y="690" /><di:waypoint x="445" y="690" /><di:waypoint x="445" y="585" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_4_di" bpmnElement="F_4"><di:waypoint x="470" y="560" /><di:waypoint x="500" y="560" /></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="F_5_di" bpmnElement="F_5"><di:waypoint x="590" y="610" /><di:waypoint x="590" y="800" /></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="F_6_di" bpmnElement="F_6"><di:waypoint x="640" y="850" /><di:waypoint x="700" y="850" /><di:waypoint x="700" y="610" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_5_di" bpmnElement="F_5"><di:waypoint x="600" y="610" /><di:waypoint x="600" y="820" /><di:waypoint x="445" y="820" /><di:waypoint x="445" y="885" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_5b_di" bpmnElement="F_5b"><di:waypoint x="470" y="910" /><di:waypoint x="500" y="910" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_6_di" bpmnElement="F_6"><di:waypoint x="640" y="910" /><di:waypoint x="700" y="910" /><di:waypoint x="700" y="610" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_7_di" bpmnElement="F_7"><di:waypoint x="810" y="560" /><di:waypoint x="840" y="560" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_8_di" bpmnElement="F_8"><di:waypoint x="865" y="535" /><di:waypoint x="865" y="480" /><bpmndi:BPMNLabel><dc:Bounds x="871" y="500" width="20" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_9_di" bpmnElement="F_9"><di:waypoint x="795" y="430" /><di:waypoint x="445" y="430" /><di:waypoint x="445" y="535" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_10_di" bpmnElement="F_10"><di:waypoint x="890" y="560" /><di:waypoint x="930" y="560" /><bpmndi:BPMNLabel><dc:Bounds x="893" y="538" width="26" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="F_11_di" bpmnElement="F_11"><di:waypoint x="955" y="585" /><di:waypoint x="955" y="920" /><di:waypoint x="570" y="920" /><di:waypoint x="570" y="900" /><bpmndi:BPMNLabel><dc:Bounds x="961" y="592" width="26" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="F_12_di" bpmnElement="F_12"><di:waypoint x="980" y="560" /><di:waypoint x="1090" y="560" /><di:waypoint x="1090" y="800" /><bpmndi:BPMNLabel><dc:Bounds x="995" y="538" width="20" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="F_13_di" bpmnElement="F_13"><di:waypoint x="1160" y="850" /><di:waypoint x="1220" y="850" /><di:waypoint x="1220" y="610" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_11_di" bpmnElement="F_11"><di:waypoint x="955" y="585" /><di:waypoint x="955" y="1000" /><di:waypoint x="445" y="1000" /><di:waypoint x="445" y="935" /><bpmndi:BPMNLabel><dc:Bounds x="961" y="592" width="26" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_12_di" bpmnElement="F_12"><di:waypoint x="980" y="560" /><di:waypoint x="1090" y="560" /><di:waypoint x="1090" y="860" /><bpmndi:BPMNLabel><dc:Bounds x="995" y="538" width="20" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_13_di" bpmnElement="F_13"><di:waypoint x="1160" y="910" /><di:waypoint x="1220" y="910" /><di:waypoint x="1220" y="610" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_14_di" bpmnElement="F_14"><di:waypoint x="1330" y="560" /><di:waypoint x="1360" y="560" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_15_di" bpmnElement="F_15"><di:waypoint x="1430" y="510" /><di:waypoint x="1430" y="295" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="F_16_di" bpmnElement="F_16"><di:waypoint x="1455" y="270" /><di:waypoint x="1600" y="270" /><di:waypoint x="1600" y="510" /><bpmndi:BPMNLabel><dc:Bounds x="1462" y="248" width="20" height="18" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
@@ -205,9 +222,12 @@
       <bpmndi:BPMNEdge id="A_prot1_di" bpmnElement="A_prot1"><di:waypoint x="770" y="610" /><di:waypoint x="785" y="645" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="A_concl_di" bpmnElement="A_concl"><di:waypoint x="1430" y="610" /><di:waypoint x="1430" y="645" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="A_log_di" bpmnElement="A_log"><di:waypoint x="1600" y="610" /><di:waypoint x="1600" y="645" /></bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="A_admit_di" bpmnElement="A_admit"><di:waypoint x="1840" y="270" /><di:waypoint x="1872" y="270" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_admit_di" bpmnElement="A_admit"><di:waypoint x="1840" y="270" /><di:waypoint x="1900" y="270" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_order2_di" bpmnElement="A_order2"><di:waypoint x="218" y="570" /><di:waypoint x="250" y="640" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="A_card_di" bpmnElement="A_card"><di:waypoint x="500" y="645" /><di:waypoint x="525" y="610" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="A_prot2_di" bpmnElement="A_prot2"><di:waypoint x="1290" y="645" /><di:waypoint x="1290" y="610" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_concl2_di" bpmnElement="A_concl2"><di:waypoint x="1156" y="270" /><di:waypoint x="1210" y="270" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A_concl3_di" bpmnElement="A_concl3"><di:waypoint x="1676" y="270" /><di:waypoint x="1700" y="270" /></bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="M_program_di" bpmnElement="M_program"><di:waypoint x="310" y="-14" /><di:waypoint x="310" y="220" /><bpmndi:BPMNLabel><dc:Bounds x="320" y="-6" width="170" height="38" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
