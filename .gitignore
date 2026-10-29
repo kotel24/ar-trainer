@@ -3,6 +3,7 @@
 *.iml
 out/
 build/
+bin/
 target/
 *.class
 __pycache__/

@@ -102,11 +102,10 @@ public class Trainer {
         return result;
     }
 
-    static Map<String, List<String>> requiredSteps(List<Map<String, String>> dependencies) {
-        Map<String, List<String>> required = new HashMap<>();
+    static Map<String, List<Map<String, String>>> requiredSteps(List<Map<String, String>> dependencies) {
+        Map<String, List<Map<String, String>>> required = new HashMap<>();
         for (Map<String, String> dependency : dependencies) {
-            required.computeIfAbsent(dependency.get("step_id"), key -> new ArrayList<>())
-                    .add(dependency.get("required_step_id"));
+            required.computeIfAbsent(dependency.get("step_id"), key -> new ArrayList<>()).add(dependency);
         }
         return required;
     }
@@ -168,30 +167,27 @@ public class Trainer {
         return error;
     }
 
-    static List<Map<String, String>> checkActions(List<Map<String, String>> steps, Map<String, List<String>> required,
+    static List<Map<String, String>> checkActions(List<Map<String, String>> steps,
+                                                  Map<String, List<Map<String, String>>> required,
                                                   List<Map<String, String>> actions,
                                                   Map<String, Map<String, String>> errorKinds) {
-        Set<String> critical = new HashSet<>();
-        for (Map<String, String> step : steps) {
-            if (step.get("critical").equals("1")) {
-                critical.add(step.get("step_id"));
-            }
-        }
-        Set<String> done = new HashSet<>();
+        Set<String> performed = new HashSet<>();
+        Set<String> valid = new HashSet<>();
         List<Map<String, String>> errors = new ArrayList<>();
         for (Map<String, String> action : actions) {
             String stepId = action.get("step_id");
-            if (done.contains(stepId)) {
+            if (valid.contains(stepId)) {
                 continue;
             }
             boolean missing = false;
             boolean dangerous = false;
-            for (String requiredId : required.getOrDefault(stepId, List.of())) {
-                if (!done.contains(requiredId)) {
+            for (Map<String, String> dependency : required.getOrDefault(stepId, List.of())) {
+                String requiredId = dependency.get("required_step_id");
+                if (!performed.contains(requiredId)) {
                     missing = true;
-                    if (critical.contains(requiredId)) {
-                        dangerous = true;
-                    }
+                }
+                if (dependency.get("dangerous").equals("1") && !valid.contains(requiredId)) {
+                    dangerous = true;
                 }
             }
             if (dangerous) {
@@ -199,13 +195,16 @@ public class Trainer {
                 if (errorKinds.get("DANGER").get("stops_attempt").equals("1")) {
                     return errors;
                 }
-            } else if (missing) {
+            } else if (missing && !performed.contains(stepId)) {
                 errors.add(newError(stepId, "ORDER"));
             }
-            done.add(stepId);
+            performed.add(stepId);
+            if (!missing) {
+                valid.add(stepId);
+            }
         }
         for (Map<String, String> step : steps) {
-            if (!done.contains(step.get("step_id"))) {
+            if (!performed.contains(step.get("step_id"))) {
                 errors.add(newError(step.get("step_id"), "SKIP"));
             }
         }
@@ -253,24 +252,18 @@ public class Trainer {
 
         Path errorsFile = dataDir.resolve("errors.csv");
         List<Map<String, String>> allErrors = new ArrayList<>();
-        List<String> oldIds = new ArrayList<>();
-        int maxId = 0;
         for (Map<String, String> row : readTable(errorsFile)) {
-            maxId = Math.max(maxId, Integer.parseInt(row.get("error_id")));
-            if (row.get("attempt_id").equals(attemptId)) {
-                oldIds.add(row.get("error_id"));
-            } else {
+            if (!row.get("attempt_id").equals(attemptId)) {
                 allErrors.add(row);
             }
         }
-        for (int i = 0; i < errors.size(); i++) {
+        for (Map<String, String> error : errors) {
             Map<String, String> row = new LinkedHashMap<>();
-            row.put("error_id", i < oldIds.size() ? oldIds.get(i) : String.valueOf(++maxId));
             row.put("attempt_id", attemptId);
-            row.putAll(errors.get(i));
+            row.putAll(error);
             allErrors.add(row);
         }
-        allErrors.sort((a, b) -> Integer.compare(Integer.parseInt(a.get("error_id")), Integer.parseInt(b.get("error_id"))));
+        allErrors.sort((a, b) -> Integer.compare(Integer.parseInt(a.get("attempt_id")), Integer.parseInt(b.get("attempt_id"))));
         writeTable(errorsFile, readColumns(errorsFile), allErrors);
     }
 
@@ -287,16 +280,22 @@ public class Trainer {
             System.out.println("В сценарии есть циклическая зависимость шагов, показать порядок нельзя");
             System.exit(1);
         }
+        Set<String> critical = new HashSet<>();
+        for (Map<String, String> dependency : dependencies) {
+            if (dependency.get("dangerous").equals("1")) {
+                critical.add(dependency.get("required_step_id"));
+            }
+        }
         Map<String, Map<String, String>> stepsById = indexBy(steps, "step_id");
         System.out.println("Режим «Обучение». Сценарий " + scenarioId + ": " + scenario.get("title"));
         System.out.println("Станок: " + scenario.get("machine_model") + ", норма времени: "
                 + scenario.get("time_norm_sec") + " с");
         for (int i = 0; i < order.size(); i++) {
             Map<String, String> step = stepsById.get(order.get(i));
-            String mark = step.get("critical").equals("1") ? " (!)" : "";
+            String mark = critical.contains(order.get(i)) ? " (!)" : "";
             System.out.println("  " + (i + 1) + ". " + step.get("action") + mark);
         }
-        System.out.println("(!) – критичный шаг: его пропуск перед опасным действием останавливает попытку");
+        System.out.println("(!) – критичный шаг: опасное действие без него останавливает попытку");
     }
 
     static void runCheck(Path dataDir, String attemptId) throws IOException {
@@ -312,7 +311,7 @@ public class Trainer {
         String scenarioId = internship.get("scenario_id");
         Map<String, String> scenario = indexBy(readTable(dataDir.resolve("scenarios.csv")), "scenario_id").get(scenarioId);
         List<Map<String, String>> steps = filterBy(readTable(dataDir.resolve("steps.csv")), "scenario_id", scenarioId);
-        Map<String, List<String>> required = requiredSteps(dependenciesOf(steps, readTable(dataDir.resolve("dependencies.csv"))));
+        Map<String, List<Map<String, String>>> required = requiredSteps(dependenciesOf(steps, readTable(dataDir.resolve("dependencies.csv"))));
         List<Map<String, String>> actions = orderBySeq(filterBy(readTable(dataDir.resolve("actions.csv")), "attempt_id", attemptId));
         Map<String, Map<String, String>> errorKinds = indexBy(readTable(dataDir.resolve("error_kinds.csv")), "kind_code");
 
