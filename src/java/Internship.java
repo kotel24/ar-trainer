@@ -1,0 +1,1 @@
+record Internship(String orderNo, String orderDate, String traineeId, String mentorId, String masterId, String scenarioId, String machineNo, int shifts, String conclusion, String conclusionDate, String completionDate, String admissionOrderNo) {}
