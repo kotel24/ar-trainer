@@ -314,6 +314,12 @@ public class Trainer {
         Map<String, List<Map<String, String>>> required = requiredSteps(dependenciesOf(steps, readTable(dataDir.resolve("dependencies.csv"))));
         List<Map<String, String>> actions = orderBySeq(filterBy(readTable(dataDir.resolve("actions.csv")), "attempt_id", attemptId));
         Map<String, Map<String, String>> errorKinds = indexBy(readTable(dataDir.resolve("error_kinds.csv")), "kind_code");
+        Map<String, String> dangerKind = errorKinds.get("DANGER");
+        if (dangerKind == null || !"1".equals(dangerKind.get("stops_attempt"))) {
+            System.err.println("Ошибка в error_kinds.csv: для вида DANGER требуется stops_attempt=1.");
+            System.exit(1);
+            return;
+        }
 
         List<Map<String, String>> errors = checkActions(steps, required, actions, errorKinds);
         int durationSec = Integer.parseInt(attempt.get("duration_sec"));
