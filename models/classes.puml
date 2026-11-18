@@ -1,0 +1,212 @@
+@startuml
+!pragma layout smetana
+skinparam classAttributeIconSize 0
+hide empty members
+top to bottom direction
+title Тренажёр 2Н135 — классы ООП-версии
+class Attempt <<record>> {
+  -id : String
+  -orderNo : String
+  -startedAt : String
+  -duration : int
+  -score : String
+  -result : String
+  +id() : String
+  +orderNo() : String
+  +startedAt() : String
+  +duration() : int
+  +score() : String
+  +result() : String
+}
+class AttemptAction <<record>> {
+  -attemptId : String
+  -sequence : String
+  -stepId : String
+  -time : int
+  +attemptId() : String
+  +sequence() : String
+  ~sequenceValue() : int
+  +stepId() : String
+  +time() : int
+}
+class AttemptChecker {
+  -List<CheckRule> rules
+  ~List<AttemptError> check(Attempt attempt, ScenarioGraph graph, List<AttemptAction> actions, Map<String, ErrorKind> kinds)
+  ~Evaluation evaluate(Attempt attempt, Scenario scenario, List<AttemptError> errors, Map<String, ErrorKind> kinds)
+}
+class AttemptError <<record>> {
+  -attemptId : String
+  -stepId : String
+  -kindCode : String
+  +attemptId() : String
+  +stepId() : String
+  +kindCode() : String
+}
+class CheckCommand {
+  -AttemptChecker checker
+  +int run(CsvStore store, String id) throws IOException
+}
+abstract class CheckRule {
+  -String code
+  ~CheckRule(String code)
+  ~boolean matches(boolean dangerous, boolean missing, boolean firstExecution)
+  ~AttemptError error(Attempt attempt, AttemptAction action)
+}
+class DangerousDependencyRule {
+  ~DangerousDependencyRule()
+  ~boolean matches(boolean dangerous, boolean missing, boolean firstExecution)
+}
+class OrderRule {
+  ~OrderRule()
+  ~boolean matches(boolean dangerous, boolean missing, boolean firstExecution)
+}
+class CsvStore {
+  -{static} String SEPARATOR
+  -Path dataDir
+  ~CsvStore(Path dataDir)
+  -<T> List<T> load(String file, Function<Map<String, String>, T> mapper) throws IOException
+  ~Scenario scenario(String id) throws IOException
+  ~Attempt attempt(String id) throws IOException
+  ~Internship internship(String orderNo) throws IOException
+  ~Worker worker(String id) throws IOException
+  ~ScenarioGraph graph(Scenario scenario) throws IOException
+  ~List<AttemptAction> actions(String id) throws IOException
+  ~Map<String, ErrorKind> errorKinds() throws IOException
+  -{static} int number(Map<String, String> row, String key)
+  -{static} List<String> readColumns(Path file) throws IOException
+  -{static} List<Map<String, String>> readTable(Path file) throws IOException
+  -{static} void writeTable(Path file, List<String> columns, List<Map<String, String>> rows) throws IOException
+  ~void save(Attempt attempt, Evaluation evaluation, List<AttemptError> errors) throws IOException
+}
+class DemoCommand {
+  +int run(CsvStore store, String id) throws IOException
+}
+class Dependency <<record>> {
+  -stepId : String
+  -requiredId : String
+  -dangerous : boolean
+  +stepId() : String
+  +requiredId() : String
+  +dangerous() : boolean
+}
+class ErrorKind <<record>> {
+  -code : String
+  -title : String
+  -penalty : String
+  -stopsAttempt : boolean
+  +code() : String
+  +title() : String
+  +penalty() : String
+  ~penaltyValue() : int
+  +stopsAttempt() : boolean
+}
+class Evaluation <<record>> {
+  -score : int
+  -result : String
+  +score() : int
+  +result() : String
+}
+class Internship <<record>> {
+  -orderNo : String
+  -orderDate : String
+  -traineeId : String
+  -mentorId : String
+  -masterId : String
+  -scenarioId : String
+  -machineNo : String
+  -shifts : int
+  -conclusion : String
+  -conclusionDate : String
+  -completionDate : String
+  -admissionOrderNo : String
+  +orderNo() : String
+  +orderDate() : String
+  +traineeId() : String
+  +mentorId() : String
+  +masterId() : String
+  +scenarioId() : String
+  +machineNo() : String
+  +shifts() : int
+  +conclusion() : String
+  +conclusionDate() : String
+  +completionDate() : String
+  +admissionOrderNo() : String
+}
+class Scenario <<record>> {
+  -id : String
+  -title : String
+  -machine : String
+  -timeLimit : String
+  -passScore : String
+  +id() : String
+  +title() : String
+  +machine() : String
+  +timeLimit() : String
+  ~timeLimitValue() : int
+  +passScore() : String
+  ~passScoreValue() : int
+}
+class ScenarioGraph {
+  -List<Step> steps
+  -List<Dependency> dependencies
+  -Map<String, Step> byId
+  -Map<String, List<Dependency>> requirements
+  ~ScenarioGraph(List<Step> steps, List<Dependency> dependencies)
+  ~List<Step> steps()
+  ~Step step(String id)
+  ~List<Dependency> requiredFor(String id)
+  ~Set<String> criticalSteps()
+  ~Optional<List<Step>> demoOrder()
+}
+class Step <<record>> {
+  -id : String
+  -scenarioId : String
+  -number : int
+  -action : String
+  +id() : String
+  +scenarioId() : String
+  +number() : int
+  +action() : String
+}
+class Trainer {
+  +{static} void main(String[] args) throws IOException
+}
+interface TrainerCommand {
+  +int run(CsvStore store, String id) throws IOException
+}
+class Worker <<record>> {
+  -id : String
+  -fullName : String
+  -profession : String
+  +id() : String
+  +fullName() : String
+  +profession() : String
+}
+Trainer ..> TrainerCommand : запускает
+DemoCommand ..|> TrainerCommand
+CheckCommand ..|> TrainerCommand
+CheckCommand "1" *-- "1" AttemptChecker
+AttemptChecker "1" *-- "2" CheckRule
+DangerousDependencyRule --|> CheckRule
+OrderRule --|> CheckRule
+ScenarioGraph "1" o-- "0..*" Step
+ScenarioGraph "1" o-- "0..*" Dependency
+Scenario "1" -- "0..*" Step : scenarioId
+Step "1" -- "0..*" Dependency : stepId
+Step "1" -- "0..*" Dependency : requiredId
+Internship "0..*" -- "1" Scenario : scenarioId
+Internship "0..*" -- "1" Worker : traineeId
+Internship "0..*" -- "1" Worker : mentorId
+Internship "0..*" -- "1" Worker : masterId
+Attempt "0..*" -- "1" Internship : orderNo
+Attempt "1" -- "0..*" AttemptAction : attemptId
+Attempt "1" -- "0..*" AttemptError : attemptId
+AttemptAction "0..*" -- "1" Step : stepId
+AttemptError "0..*" -- "1" Step : stepId
+AttemptError "0..*" -- "1" ErrorKind : kindCode
+DemoCommand ..> CsvStore
+CheckCommand ..> CsvStore
+AttemptChecker ..> Evaluation
+AttemptChecker ..> ScenarioGraph
+CsvStore ..> ScenarioGraph
+@enduml

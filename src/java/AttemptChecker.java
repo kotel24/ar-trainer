@@ -48,14 +48,14 @@ final class AttemptChecker {
         boolean stopped = false;
         for (AttemptError error : errors) {
             ErrorKind kind = kinds.get(error.kindCode());
-            score -= kind.penalty();
+            score -= kind.penaltyValue();
             stopped |= kind.stopsAttempt();
         }
         score = Math.max(score, 0);
         if (stopped) {
             return new Evaluation(score, "остановлена");
         }
-        boolean passed = score >= scenario.passScore() && attempt.duration() <= scenario.timeLimit();
+        boolean passed = score >= scenario.passScoreValue() && attempt.duration() <= scenario.timeLimitValue();
         return new Evaluation(score, passed ? "сдано" : "не сдано");
     }
 }

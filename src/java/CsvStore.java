@@ -19,7 +19,7 @@ final class CsvStore {
 
     Scenario scenario(String id) throws IOException {
         return load("scenarios.csv", r -> new Scenario(r.get("scenario_id"), r.get("title"),
-                r.get("machine_model"), number(r, "time_norm_sec"), number(r, "pass_score")))
+                r.get("machine_model"), r.get("time_norm_sec"), r.get("pass_score")))
                 .stream().filter(s -> s.id().equals(id)).reduce((first, last) -> last).orElse(null);
     }
 
@@ -59,11 +59,11 @@ final class CsvStore {
 
     List<AttemptAction> actions(String id) throws IOException {
         List<AttemptAction> actions = load("actions.csv", r -> new AttemptAction(r.get("attempt_id"),
-                number(r, "seq_no"), r.get("step_id"), number(r, "time_sec"))).stream()
+                r.get("seq_no"), r.get("step_id"), number(r, "time_sec"))).stream()
                 .filter(a -> a.attemptId().equals(id)).toList();
         List<AttemptAction> ordered = new ArrayList<>(Collections.nCopies(actions.size(), null));
         for (AttemptAction action : actions) {
-            ordered.set(action.sequence() - 1, action);
+            ordered.set(action.sequenceValue() - 1, action);
         }
         return ordered;
     }
@@ -71,7 +71,7 @@ final class CsvStore {
     Map<String, ErrorKind> errorKinds() throws IOException {
         Map<String, ErrorKind> kinds = new HashMap<>();
         for (ErrorKind kind : load("error_kinds.csv", r -> new ErrorKind(r.get("kind_code"),
-                r.get("title"), number(r, "penalty"), "1".equals(r.get("stops_attempt"))))) {
+                r.get("title"), r.get("penalty"), "1".equals(r.get("stops_attempt"))))) {
             kinds.put(kind.code(), kind);
         }
         return kinds;
