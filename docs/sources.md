@@ -23,3 +23,4 @@
 21. JEP 180: Handle Frequent HashMap Collisions with Balanced Trees / M. Duigou. – Text : electronic // OpenJDK : site. – URL: https://openjdk.org/jeps/180 (дата обращения: 25.10.2026).
 22. JEP 441: Pattern Matching for switch / G. Bierman. – Text : electronic // OpenJDK : site. – URL: https://openjdk.org/jeps/441 (дата обращения: 25.10.2026).
 23. Morales Méndez, G. Augmented Reality in Industry 4.0 Assistance and Training Areas: A Systematic Literature Review and Bibliometric Analysis / G. Morales Méndez, F. del Cerro Velázquez. – DOI 10.3390/electronics13061147. – Text : electronic // Electronics. – 2024. – Vol. 13, No. 6. – Art. 1147. – URL: https://www.mdpi.com/2079-9292/13/6/1147 (дата обращения: 28.09.2026).
+24. Object Management Group. Unified Modeling Language. Version 2.5.1. – December 2017. – Text : electronic. – URL: https://www.omg.org/spec/UML/2.5.1 (дата обращения: 18.11.2026).
