@@ -155,7 +155,7 @@ class ScenarioGraph {
   ~List<Step> steps()
   ~Step step(String id)
   ~List<Dependency> requiredFor(String id)
-  ~Set<String> criticalSteps()
+  ~Set<String> criticalStepIds()
   ~Optional<List<Step>> demoOrder()
 }
 class Step <<record>> {
