@@ -13,14 +13,14 @@ final class AttemptChecker {
             if (valid.contains(stepId)) {
                 continue;
             }
-            boolean missing = false;
-            boolean dangerous = false;
+            boolean hasUnperformedPrerequisite = false;
+            boolean hasUnmetCriticalPrerequisite = false;
             for (Dependency dependency : graph.requiredFor(stepId)) {
-                missing |= !performed.contains(dependency.requiredId());
-                dangerous |= dependency.dangerous() && !valid.contains(dependency.requiredId());
+                hasUnperformedPrerequisite |= !performed.contains(dependency.requiredId());
+                hasUnmetCriticalPrerequisite |= dependency.dangerous() && !valid.contains(dependency.requiredId());
             }
             for (CheckRule rule : rules) {
-                if (rule.matches(dangerous, missing, !performed.contains(stepId))) {
+                if (rule.matches(hasUnmetCriticalPrerequisite, hasUnperformedPrerequisite, !performed.contains(stepId))) {
                     AttemptError error = rule.error(attempt, action);
                     errors.add(error);
                     if ("DANGER".equals(error.kindCode()) && kinds.get("DANGER").stopsAttempt()) {
@@ -30,7 +30,7 @@ final class AttemptChecker {
                 }
             }
             performed.add(stepId);
-            if (!missing) {
+            if (!hasUnperformedPrerequisite) {
                 valid.add(stepId);
             }
         }

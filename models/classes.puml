@@ -49,16 +49,16 @@ class CheckCommand {
 abstract class CheckRule {
   -String code
   ~CheckRule(String code)
-  ~boolean matches(boolean dangerous, boolean missing, boolean firstExecution)
+  ~boolean matches(boolean hasUnmetCriticalPrerequisite, boolean hasUnperformedPrerequisite, boolean firstOccurrenceOfStep)
   ~AttemptError error(Attempt attempt, AttemptAction action)
 }
 class DangerousDependencyRule {
   ~DangerousDependencyRule()
-  ~boolean matches(boolean dangerous, boolean missing, boolean firstExecution)
+  ~boolean matches(boolean hasUnmetCriticalPrerequisite, boolean hasUnperformedPrerequisite, boolean firstOccurrenceOfStep)
 }
 class OrderRule {
   ~OrderRule()
-  ~boolean matches(boolean dangerous, boolean missing, boolean firstExecution)
+  ~boolean matches(boolean hasUnmetCriticalPrerequisite, boolean hasUnperformedPrerequisite, boolean firstOccurrenceOfStep)
 }
 class CsvStore {
   -{static} String SEPARATOR
