@@ -44,16 +44,28 @@ final class CsvStore {
     }
 
     ScenarioGraph graph(Scenario scenario) throws IOException {
-        List<Step> steps = load("steps.csv", r -> new Step(r.get("step_id"), r.get("scenario_id"),
-                number(r, "step_no"), r.get("action"))).stream()
-                .filter(step -> step.scenarioId().equals(scenario.id())).toList();
-        Set<String> ids = new HashSet<>();
-        for (Step step : steps) {
-            ids.add(step.id());
+        List<Step> steps = new ArrayList<>();
+        Map<String, String> scenariosByStepId = new HashMap<>();
+        for (Step step : load("steps.csv", r -> new Step(r.get("step_id"), r.get("scenario_id"),
+                number(r, "step_no"), r.get("action")))) {
+            scenariosByStepId.put(step.id(), step.scenarioId());
+            if (scenario.id().equals(step.scenarioId())) {
+                steps.add(step);
+            }
         }
-        List<Dependency> dependencies = load("dependencies.csv", r -> new Dependency(r.get("step_id"),
-                r.get("required_step_id"), "1".equals(r.get("dangerous")))).stream()
-                .filter(d -> ids.contains(d.stepId()) && ids.contains(d.requiredId())).toList();
+        List<Dependency> dependencies = new ArrayList<>();
+        for (Dependency dependency : load("dependencies.csv", r -> new Dependency(r.get("step_id"),
+                r.get("required_step_id"), "1".equals(r.get("dangerous"))))) {
+            String dependentScenario = scenariosByStepId.get(dependency.stepId());
+            String requiredScenario = scenariosByStepId.get(dependency.requiredId());
+            if (dependentScenario == null || !dependentScenario.equals(requiredScenario)) {
+                throw new IOException("Ошибка в dependencies.csv: шаги " + dependency.stepId()
+                        + " и " + dependency.requiredId() + " должны существовать и принадлежать одному сценарию.");
+            }
+            if (scenario.id().equals(dependentScenario)) {
+                dependencies.add(dependency);
+            }
+        }
         return new ScenarioGraph(steps, dependencies);
     }
 

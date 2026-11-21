@@ -169,7 +169,7 @@ class Step <<record>> {
   +action() : String
 }
 class Trainer {
-  +{static} void main(String[] args) throws IOException
+  +{static} void main(String[] args)
 }
 interface TrainerCommand {
   +int run(CsvStore store, String id) throws IOException
