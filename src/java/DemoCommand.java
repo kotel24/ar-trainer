@@ -16,7 +16,7 @@ final class DemoCommand implements TrainerCommand {
             System.out.println("В сценарии есть циклическая зависимость шагов, показать порядок нельзя");
             return 1;
         }
-        Set<String> critical = graph.criticalSteps();
+        Set<String> critical = graph.criticalStepIds();
         System.out.println("Режим «Обучение». Сценарий " + id + ": " + scenario.title());
         System.out.println("Станок: " + scenario.machine() + ", норма времени: " + scenario.timeLimit() + " с");
         for (int i = 0; i < order.size(); i++) {

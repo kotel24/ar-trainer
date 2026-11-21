@@ -29,7 +29,7 @@ final class ScenarioGraph {
         return requirements.getOrDefault(id, List.of());
     }
 
-    Set<String> criticalSteps() {
+    Set<String> criticalStepIds() {
         Set<String> critical = new HashSet<>();
         for (Dependency dependency : dependencies) {
             if (dependency.dangerous()) {
