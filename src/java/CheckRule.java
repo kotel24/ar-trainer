@@ -5,7 +5,7 @@ abstract class CheckRule {
         this.code = code;
     }
 
-    abstract boolean matches(boolean dangerous, boolean missing, boolean firstExecution);
+    abstract boolean matches(boolean hasUnmetCriticalPrerequisite, boolean hasUnperformedPrerequisite, boolean firstOccurrenceOfStep);
 
     AttemptError error(Attempt attempt, AttemptAction action) {
         return new AttemptError(attempt.id(), action.stepId(), code);
@@ -18,8 +18,8 @@ final class DangerousDependencyRule extends CheckRule {
     }
 
     @Override
-    boolean matches(boolean dangerous, boolean missing, boolean firstExecution) {
-        return dangerous;
+    boolean matches(boolean hasUnmetCriticalPrerequisite, boolean hasUnperformedPrerequisite, boolean firstOccurrenceOfStep) {
+        return hasUnmetCriticalPrerequisite;
     }
 }
 
@@ -29,7 +29,7 @@ final class OrderRule extends CheckRule {
     }
 
     @Override
-    boolean matches(boolean dangerous, boolean missing, boolean firstExecution) {
-        return missing && firstExecution;
+    boolean matches(boolean hasUnmetCriticalPrerequisite, boolean hasUnperformedPrerequisite, boolean firstOccurrenceOfStep) {
+        return hasUnperformedPrerequisite && firstOccurrenceOfStep;
     }
 }
