@@ -1,1 +1,1 @@
-record Dependency(String stepId, String requiredId, boolean dangerous) {}
+record Dependency(String dependentStepId, String requiredStepId, boolean dangerous) {}

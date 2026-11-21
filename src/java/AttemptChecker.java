@@ -16,8 +16,8 @@ final class AttemptChecker {
             boolean hasUnperformedPrerequisite = false;
             boolean hasUnmetCriticalPrerequisite = false;
             for (Dependency dependency : graph.requiredFor(stepId)) {
-                hasUnperformedPrerequisite |= !performed.contains(dependency.requiredId());
-                hasUnmetCriticalPrerequisite |= dependency.dangerous() && !valid.contains(dependency.requiredId());
+                hasUnperformedPrerequisite |= !performed.contains(dependency.requiredStepId());
+                hasUnmetCriticalPrerequisite |= dependency.dangerous() && !valid.contains(dependency.requiredStepId());
             }
             for (CheckRule rule : rules) {
                 if (rule.matches(hasUnmetCriticalPrerequisite, hasUnperformedPrerequisite, !performed.contains(stepId))) {
