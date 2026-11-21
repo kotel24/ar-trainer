@@ -82,11 +82,11 @@ class DemoCommand {
   +int run(CsvStore store, String id) throws IOException
 }
 class Dependency <<record>> {
-  -stepId : String
-  -requiredId : String
+  -dependentStepId : String
+  -requiredStepId : String
   -dangerous : boolean
-  +stepId() : String
-  +requiredId() : String
+  +dependentStepId() : String
+  +requiredStepId() : String
   +dangerous() : boolean
 }
 class ErrorKind <<record>> {
@@ -192,8 +192,8 @@ OrderRule --|> CheckRule
 ScenarioGraph "1" o-- "0..*" Step
 ScenarioGraph "1" o-- "0..*" Dependency
 Scenario "1" -- "0..*" Step : scenarioId
-Step "1" -- "0..*" Dependency : stepId
-Step "1" -- "0..*" Dependency : requiredId
+Step "1" -- "0..*" Dependency : dependentStepId
+Step "1" -- "0..*" Dependency : requiredStepId
 Internship "0..*" -- "1" Scenario : scenarioId
 Internship "0..*" -- "1" Worker : traineeId
 Internship "0..*" -- "1" Worker : mentorId

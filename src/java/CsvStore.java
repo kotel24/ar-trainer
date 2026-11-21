@@ -56,11 +56,11 @@ final class CsvStore {
         List<Dependency> dependencies = new ArrayList<>();
         for (Dependency dependency : load("dependencies.csv", r -> new Dependency(r.get("step_id"),
                 r.get("required_step_id"), "1".equals(r.get("dangerous"))))) {
-            String dependentScenario = scenariosByStepId.get(dependency.stepId());
-            String requiredScenario = scenariosByStepId.get(dependency.requiredId());
+            String dependentScenario = scenariosByStepId.get(dependency.dependentStepId());
+            String requiredScenario = scenariosByStepId.get(dependency.requiredStepId());
             if (dependentScenario == null || !dependentScenario.equals(requiredScenario)) {
-                throw new IOException("Ошибка в dependencies.csv: шаги " + dependency.stepId()
-                        + " и " + dependency.requiredId() + " должны существовать и принадлежать одному сценарию.");
+                throw new IOException("Ошибка в dependencies.csv: шаги " + dependency.dependentStepId()
+                        + " и " + dependency.requiredStepId() + " должны существовать и принадлежать одному сценарию.");
             }
             if (scenario.id().equals(dependentScenario)) {
                 dependencies.add(dependency);

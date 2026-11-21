@@ -13,7 +13,7 @@ final class ScenarioGraph {
             byId.put(step.id(), step);
         }
         for (Dependency dependency : dependencies) {
-            requirements.computeIfAbsent(dependency.stepId(), id -> new ArrayList<>()).add(dependency);
+            requirements.computeIfAbsent(dependency.dependentStepId(), id -> new ArrayList<>()).add(dependency);
         }
     }
 
@@ -33,7 +33,7 @@ final class ScenarioGraph {
         Set<String> critical = new HashSet<>();
         for (Dependency dependency : dependencies) {
             if (dependency.dangerous()) {
-                critical.add(dependency.requiredId());
+                critical.add(dependency.requiredStepId());
             }
         }
         return critical;
@@ -47,7 +47,7 @@ final class ScenarioGraph {
             dependents.put(step.id(), new ArrayList<>());
         }
         for (Dependency dependency : dependencies) {
-            dependents.get(dependency.requiredId()).add(dependency.stepId());
+            dependents.get(dependency.requiredStepId()).add(dependency.dependentStepId());
         }
         PriorityQueue<Step> ready = new PriorityQueue<>(Comparator.comparingInt(Step::number));
         for (Step step : steps) {
